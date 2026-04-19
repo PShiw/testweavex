@@ -1,5 +1,5 @@
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone
 from testweavex.core.models import generate_stable_id, TestStatus, TestType, GapStatus
 
 
@@ -58,7 +58,7 @@ class TestEnums:
 class TestTestCase:
     def test_valid_construction(self):
         from testweavex.core.models import TestCase
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
         tc = TestCase(
             id=generate_stable_id("features/login.feature", "User logs in"),
             title="User logs in",
@@ -76,7 +76,7 @@ class TestTestCase:
 
     def test_invalid_test_type_raises(self):
         from testweavex.core.models import TestCase
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
         with pytest.raises(Exception):
             TestCase(
                 id="x" * 64,
@@ -96,7 +96,7 @@ class TestGap:
         gap = Gap(
             id="g" * 64,
             test_case_id="t" * 64,
-            detected_at=datetime.utcnow(),
+            detected_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
         assert gap.priority_score == 0.0
         assert gap.status == GapStatus.open
@@ -107,7 +107,7 @@ class TestGap:
             id="g" * 64,
             test_case_id="t" * 64,
             priority_score=0.85,
-            detected_at=datetime.utcnow(),
+            detected_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
         assert gap.priority_score == 0.85
 
@@ -118,7 +118,7 @@ class TestGap:
                 id="g" * 64,
                 test_case_id="t" * 64,
                 priority_score=1.5,
-                detected_at=datetime.utcnow(),
+                detected_at=datetime.now(timezone.utc).replace(tzinfo=None),
             )
 
     def test_priority_score_rejects_below_zero(self):
@@ -128,7 +128,7 @@ class TestGap:
                 id="g" * 64,
                 test_case_id="t" * 64,
                 priority_score=-0.1,
-                detected_at=datetime.utcnow(),
+                detected_at=datetime.now(timezone.utc).replace(tzinfo=None),
             )
 
 
@@ -138,7 +138,7 @@ class TestRunAndResult:
         run = TestRun(
             id="r" * 36,
             suite="regression",
-            started_at=datetime.utcnow(),
+            started_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
         assert run.environment == "local"
         assert run.triggered_by == "tw"
